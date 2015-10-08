@@ -1,0 +1,9 @@
+.idea/
+config.core.php
+data/
+dev/
+/vendor/
+/.Oldstyle
+/_backup
+/_data
+/_migrate
