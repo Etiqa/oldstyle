@@ -1,6 +1,5 @@
 <?php
 namespace etiqa\Oldstyle\Command;
-
 use etiqa\Oldstyle\Oldstyle;
 use etiqa\Oldstyle\BaseCommand;
 use Symfony\Component\Console\Input\ArrayInput;

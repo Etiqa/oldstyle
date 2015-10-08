@@ -60,6 +60,7 @@ class MigrateCommand extends BaseCommand
         // Grab the directory the migrate are in
         $migrateDirectory = isset($this->config['migrate_directory']) ? $this->config['migrate_directory'] : '_migrate/';
         $targetDirectory = OLDSTYLE_WORKING_DIR . $migrateDirectory;
+        $flywaySchema = OLDSTYLE_WORKING_DIR."flyway/flyway.sql";
 
         // Make sure the directory exists
         if (!is_dir($targetDirectory) || !is_readable($targetDirectory)) {
@@ -72,7 +73,7 @@ class MigrateCommand extends BaseCommand
         $database_password = str_replace("'", '\'', $database_password);
         $link = mysqli_connect($database_server,$database_user,$database_password,$dbase) or die("Error " . mysqli_error($link));
 
-        $flyway = new Flyway($link,$targetDirectory);
+        $flyway = new Flyway($link,$targetDirectory,$flywaySchema);
         $flyway->migrate();
         return 0;
     }

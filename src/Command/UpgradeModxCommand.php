@@ -40,7 +40,7 @@ class UpgradeModxCommand extends BaseCommand
 
         // Variables for running the setup
         $tz = date_default_timezone_get();
-        $wd = GITIFY_WORKING_DIR;
+        $wd = OLDSTYLE_WORKING_DIR;
         $output->writeln("Running MODX Upgrade...");
 
         // Actually run the CLI setup
@@ -59,7 +59,7 @@ class UpgradeModxCommand extends BaseCommand
 
     protected function createMODXConfig()
     {
-        $directory = GITIFY_WORKING_DIR;
+        $directory = OLDSTYLE_WORKING_DIR;
 
         $config = array(
             'inplace' => 1,

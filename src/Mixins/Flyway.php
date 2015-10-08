@@ -1,39 +1,25 @@
 <?php
 namespace etiqa\Oldstyle\Mixins;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Class Flyway
+ *
+ * Flyway migration tool porting
+ *
+ * @package etiqa\Oldstyle\Mixins
  */
 
 class Flyway {
 
     private $databaseConnection = null;
-    private $tableName = "flyway_schema";
-    private $createStatement = "CREATE TABLE IF NOT EXISTS flyway_schema (
-  `version_rank` int(11) NOT NULL,
-  `installed_rank` int(11) NOT NULL,
-  `version` varchar(50) NOT NULL,
-  `description` varchar(200) NOT NULL,
-  `type` varchar(20) NOT NULL,
-  `script` varchar(1000) NOT NULL,
-  `info` varchar(1000) NOT NULL,
-  `success` tinyint(1) NOT NULL,
-  PRIMARY KEY (`version`),
-  KEY `schema_version_vr_idx` (`version_rank`),
-  KEY `schema_version_ir_idx` (`installed_rank`),
-  KEY `schema_version_s_idx` (`success`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    private $createStatement = "";
 
-    function __construct($databaseConnection, $migration_folder) {
+    function __construct($databaseConnection, $migration_folder, $flywaySchema) {
         $this->databaseConnection = $databaseConnection;
         $this->folderPath = $migration_folder;
+        $this->createStatement = file_get_contents($flywaySchema);
     }
 
-    function __contruct() {
-
-    }
 
     function getDatabaseConnection() {
         return $this->databaseConnection;
@@ -55,7 +41,6 @@ class Flyway {
         $query = $connection->query("SELECT * FROM flyway_schema IF EXISTS");
         $this->output("Checking flyway_schema table");
         if (!$query) {
-            //$query->free_result();
             $this->output( "Flyway_schema doesn't exist");
             $queryCreateTable = $connection->query($this->createStatement);
              $this->output( "Creating flyway_schema table");
@@ -64,8 +49,7 @@ class Flyway {
                 $queryCreateTable->free_result();
                 return false;
             } else {
-                //$queryCreateTable->free_result();
-                 $this->output("Flyway_shema table created");
+                 $this->output("Flyway_schema table created");
                 return true;
             }
         } else {
@@ -77,7 +61,7 @@ class Flyway {
 
     function executeFile($connection, $file) {
         $this->output( "Reading script $file");
-        $statement = file_get_contents($this->folderPath . "/" . $file);
+        $statement = file_get_contents($this->folderPath . $file);
         if (!$statement) {
             die('Error opening file');
         } else {
@@ -152,13 +136,13 @@ class Flyway {
 
                         //$success = 0;
 
-                        $infoStateMent = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
+                        $infoStatement = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
 
 
-                        $stmt = $connection->prepare($infoStateMent);
+                        $stmt = $connection->prepare($infoStatement);
 
                         if (!$stmt) {
-                            trigger_error('Wrong SQL: ' . $infoStateMent . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
+                            trigger_error('Wrong SQL: ' . $infoStatement . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
                         }
 
                         $stmt->bind_param("iisssssi", $intVersion, $intVersion, $version, $name, $type, $script, $info, $success);
