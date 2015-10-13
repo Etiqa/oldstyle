@@ -1,6 +1,7 @@
 <?php
 namespace etiqa\Oldstyle\Mixins;
 
+
 /**
  * Class Flyway
  *
@@ -107,52 +108,57 @@ class Flyway {
     public function migrate() {
        $this->output( "Creating connection...");
         $connection = $this->databaseConnection;
-
+        $versions = array();
         if ($this->checkTable($connection)) {
-            $files = scandir($this->folderPath);
-            //print_r($files);
-            sort($files);
+
+            $directory = new \DirectoryIterator($this->folderPath);
+            foreach ($directory as $path => $info) {
+                /** @var \SplFileInfo $info */
+                $name = $info->getBasename();
+                // Ignore dotfiles/folders
+                if (substr($name, 0, 1) == '.') {
+                    continue;
+                }
+
+                if ($info->isDir()) {
+                    continue;
+                }
+
+                $version = intval(preg_match('/[0-9]{1,9}/'));
+                $migrationFiles[$name] = array(
+                    'script' => $name,
+                    'extension' => $info->getExtension(),
+                    'version'=> $version
+                );
+                $versions[] = $version;
+            }
+            array_multisort($versions,$migrationFiles);
             $last = $this->last($connection);
-            foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
-                    $script = $file;
-                    $splitedDot = explode(".", $file);
-                    $type = $splitedDot[1];
-                    $splited__ = explode("__", $splitedDot[0]);
-                    $name = $splited__[1];
-                    $version = substr($splited__[0], 1);
-                    $intVersion = intval($version);
-
-                    if ($intVersion > $last) {
-
-                        // echo " $script $type $name $version";
-                        $success = $this->executeFile($connection, $file);
-
-                        $info = $connection->info;
-                        if (!$info || $info = "") {
-                            $info = "no info";
-                        }
-                        $this->output( "Inserting row schema version $intVersion output $success into flyway_schema"); 
-
-                        //$success = 0;
-
-                        $infoStatement = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
-
-
-                        $stmt = $connection->prepare($infoStatement);
-
-                        if (!$stmt) {
-                            trigger_error('Wrong SQL: ' . $infoStatement . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
-                        }
-
-                        $stmt->bind_param("iisssssi", $intVersion, $intVersion, $version, $name, $type, $script, $info, $success);
-
-                        $stmt->execute() or die(' Error: ' . $connection->errno . ' ' . $connection->error);
-                        $this->output("Affected rows flyway_schema: ". $stmt->affected_rows);
-
-                        
-                        $stmt->close();
+            foreach ($migrationFiles as $key => $file) {
+                if ($file['version'] > $last) {
+                    $success = $this->executeFile($connection, $file['script']);
+                    $info = $connection->info;
+                    if (!$info || $info = "") {
+                        $info = "no info";
                     }
+                    $this->output( "Inserting row schema version {$file['version']} output $success into flyway_schema");
+
+                    $infoStatement = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
+
+
+                    $stmt = $connection->prepare($infoStatement);
+
+                    if (!$stmt) {
+                        trigger_error('Wrong SQL: ' . $infoStatement . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
+                    }
+
+                    $stmt->bind_param("iisssssi", $file['version'], $file['version'], $file['version'], $name, $file['extension'], $file['script'], $info, $success);
+
+                    $stmt->execute() or die(' Error: ' . $connection->errno . ' ' . $connection->error);
+                    $this->output("Affected rows flyway_schema: ". $stmt->affected_rows);
+
+
+                    $stmt->close();
                 }
             }
         }
