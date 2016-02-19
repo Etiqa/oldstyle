@@ -1,4 +1,4 @@
-<?php
+ <?php
 namespace etiqa\Oldstyle\Command;
 use etiqa\Oldstyle\Oldstyle;
 use etiqa\Oldstyle\BaseCommand;

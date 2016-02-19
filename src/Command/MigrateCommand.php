@@ -3,7 +3,7 @@ namespace etiqa\Oldstyle\Command;
 
 use etiqa\Oldstyle\Oldstyle;
 use etiqa\Oldstyle\BaseCommand;
-use etiqa\Oldstyle\Mixing\Flyway;
+use etiqa\Oldstyle\Mixins\Flyway;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
