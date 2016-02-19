@@ -24,6 +24,9 @@ if (version_compare(phpversion(),'5.3.0') >= 0) {
 if (!defined('OLDSTYLE_WORKING_DIR')) {
     define ('OLDSTYLE_WORKING_DIR', $cwd = getcwd() . DIRECTORY_SEPARATOR);
 }
+if (!defined('OLDSTYLE_APP_DIR')){
+    define ('OLDSTYLE_APP_DIR',dirname(__FILE__));
+}
 
 /**
  * Load all the commands and create the Oldstyle instance
