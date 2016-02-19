@@ -36,7 +36,7 @@ class BackupCommand extends BaseCommand
                 'exclude-tables',
                 null,
                 InputOption::VALUE_NONE,
-                'Exclude table from db backup based on .Oldstyle_ignore_table file'
+                'Exclude table from db backup based on exclude table file configuration [default .backup_ignore_tables]'
             )
         ;
     }

@@ -363,7 +363,7 @@ class BuildCommand extends BaseCommand
             /**
              * @deprecated 2015-03-30
              *
-             * Deprecated in favour of specifying truncate_on_force in the .Oldstyle file.
+             * Deprecated in favour of specifying truncate_on_force in the .oldstyle file.
              */
             switch ($type['class']) {
                 // $modx->removeCollection does not automatically remove related objects, which in the case

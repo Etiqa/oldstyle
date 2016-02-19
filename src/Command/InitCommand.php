@@ -13,7 +13,7 @@ use Symfony\Component\Console\Question\Question;
 /**
  * Class InitCommand
  *
- * Initiates a new Oldstyle project by asking some questions and creating the .Oldstyle file.
+ * Initiates a new Oldstyle project by asking some questions and creating the .oldstyle file.
  *
  * @package etiqa\Oldstyle\Command
  */
@@ -26,13 +26,13 @@ class InitCommand extends BaseCommand
     {
         $this
             ->setName('init')
-            ->setDescription('Generates the .Oldstyle file to set up a new Oldstyle project. Optionally installs MODX as well.')
+            ->setDescription('Generates the .oldstyle file to set up a new Oldstyle project. Optionally installs MODX as well.')
 
             ->addOption(
                 'overwrite',
                 null,
                 InputOption::VALUE_NONE,
-                'When a .Oldstyle file already exists, and this flag is set, it will be overwritten.'
+                'When a .oldstyle file already exists, and this flag is set, it will be overwritten.'
             )
         ;
     }
@@ -46,8 +46,8 @@ class InitCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Make sure we're not overwriting existing configuration by checking for existing .Oldstyle files
-        if (file_exists(OLDSTYLE_WORKING_DIR . '.Oldstyle'))
+        // Make sure we're not overwriting existing configuration by checking for existing .oldstyle files
+        if (file_exists(OLDSTYLE_WORKING_DIR . '.oldstyle'))
         {
             // If the overwrite option is set we'll warn the user but continue anyway
             if ($input->getOption('overwrite'))
@@ -164,8 +164,8 @@ class InitCommand extends BaseCommand
          * Turn the configuration into YAML, and write the file.
          */
         $config = Oldstyle::toYAML($data);
-        file_put_contents(OLDSTYLE_WORKING_DIR . '.Oldstyle', $config);
-        $output->writeln('<info>Oldstyle Project initiated and .Oldstyle file written.</info>');
+        file_put_contents(OLDSTYLE_WORKING_DIR . '.oldstyle', $config);
+        $output->writeln('<info>Oldstyle Project initiated and .oldstyle file written.</info>');
 
         /**
          * Check if we already have MODX installed, and if not, offer to install it right away.
