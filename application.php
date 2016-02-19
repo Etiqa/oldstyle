@@ -43,7 +43,7 @@ use etiqa\Oldstyle\Command\RestoreCommand;
 use etiqa\Oldstyle\Command\MigrateCommand;
 
 
-$application = new Oldstyle('Oldstyle', '0.1.0');
+$application = new Oldstyle('Oldstyle', '0.2.0');
 $application->add(new InitCommand);
 $application->add(new InstallModxCommand);
 $application->add(new UpgradeModxCommand);
