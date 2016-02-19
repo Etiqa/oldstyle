@@ -39,7 +39,7 @@ class Flyway {
     }
 
     function checkTable($connection) {
-        $query = $connection->query("SELECT * FROM flyway_schema IF EXISTS");
+        $query = $connection->query("SHOW TABLES LIKE 'flyway_schema'");
         $this->output("Checking flyway_schema table");
         if (!$query) {
             $this->output( "Flyway_schema doesn't exist");
@@ -124,7 +124,8 @@ class Flyway {
                     continue;
                 }
 
-                $version = intval(preg_match('/[0-9]{1,9}/'));
+                preg_match('/[0-9]{1,9}/',$name,$match);
+                $version = intval($match[0]);
                 $migrationFiles[$name] = array(
                     'script' => $name,
                     'extension' => $info->getExtension(),
@@ -132,34 +133,38 @@ class Flyway {
                 );
                 $versions[] = $version;
             }
-            array_multisort($versions,$migrationFiles);
-            $last = $this->last($connection);
-            foreach ($migrationFiles as $key => $file) {
-                if ($file['version'] > $last) {
-                    $success = $this->executeFile($connection, $file['script']);
-                    $info = $connection->info;
-                    if (!$info || $info = "") {
-                        $info = "no info";
+            if(!empty($versions)) {
+                array_multisort($versions, $migrationFiles);
+                $last = $this->last($connection);
+                foreach ($migrationFiles as $key => $file) {
+                    if ($file['version'] > $last) {
+                        $success = $this->executeFile($connection, $file['script']);
+                        $info = $connection->info;
+                        if (!$info || $info = "") {
+                            $info = "no info";
+                        }
+                        $this->output("Inserting row schema version {$file['version']} output $success into flyway_schema");
+
+                        $infoStatement = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
+
+
+                        $stmt = $connection->prepare($infoStatement);
+
+                        if (!$stmt) {
+                            trigger_error('Wrong SQL: ' . $infoStatement . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
+                        }
+
+                        $stmt->bind_param("iisssssi", $file['version'], $file['version'], $file['version'], $name, $file['extension'], $file['script'], $info, $success);
+
+                        $stmt->execute() or die(' Error: ' . $connection->errno . ' ' . $connection->error);
+                        $this->output("Affected rows flyway_schema: " . $stmt->affected_rows);
+
+
+                        $stmt->close();
                     }
-                    $this->output( "Inserting row schema version {$file['version']} output $success into flyway_schema");
-
-                    $infoStatement = "INSERT INTO flyway_schema VALUES(?,?,?,?,?,?,?,?)";
-
-
-                    $stmt = $connection->prepare($infoStatement);
-
-                    if (!$stmt) {
-                        trigger_error('Wrong SQL: ' . $infoStatement . ' Error: ' . $connection->errno . ' ' . $connection->error, E_USER_ERROR);
-                    }
-
-                    $stmt->bind_param("iisssssi", $file['version'], $file['version'], $file['version'], $name, $file['extension'], $file['script'], $info, $success);
-
-                    $stmt->execute() or die(' Error: ' . $connection->errno . ' ' . $connection->error);
-                    $this->output("Affected rows flyway_schema: ". $stmt->affected_rows);
-
-
-                    $stmt->close();
                 }
+            }else{
+                $this->output("Nothing to migrate");
             }
         }
     }
