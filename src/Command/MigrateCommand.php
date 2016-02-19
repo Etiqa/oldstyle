@@ -3,7 +3,7 @@ namespace etiqa\Oldstyle\Command;
 
 use etiqa\Oldstyle\Oldstyle;
 use etiqa\Oldstyle\BaseCommand;
-use etiqa\Oldstyle\Mixing\Flyway;
+use etiqa\Oldstyle\Mixins\Flyway;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,7 +60,7 @@ class MigrateCommand extends BaseCommand
         // Grab the directory the migrate are in
         $migrateDirectory = isset($this->config['migrate_directory']) ? $this->config['migrate_directory'] : '_migrate/';
         $targetDirectory = OLDSTYLE_WORKING_DIR . $migrateDirectory;
-        $flywaySchema = OLDSTYLE_WORKING_DIR."flyway/flyway_schema.sql";
+        $flywaySchema = OLDSTYLE_APP_DIR."flyway/flyway_schema.sql";
 
         // Make sure the directory exists
         if (!is_dir($targetDirectory) || !is_readable($targetDirectory)) {

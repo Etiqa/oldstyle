@@ -280,7 +280,7 @@ class ExtractCommand extends BaseCommand
             }
         }
 
-        // Strip out keys that have the same value as the default, or are excluded per the .Oldstyle
+        // Strip out keys that have the same value as the default, or are excluded per the .oldstyle
         $excludes = (isset($options['exclude_keys']) && is_array($options['exclude_keys'])) ? $options['exclude_keys'] : array();
         foreach ($data as $key => $value) {
             if (
