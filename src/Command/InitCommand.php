@@ -103,167 +103,18 @@ class InitCommand extends BaseCommand
             mkdir($directory);
         }
 
+
+        $question = new Question('Please enter the name the file you want to use to ignore tables in backup (defaults to .backup_ignore_tables): ', '.backup_ignore_tables');
+        $ignore_file = $helper->ask($input, $output, $question);
+        $data['backup_ignore_table_file'] = $ignore_file;
+        if (!file_exists($ignore_file)) {
+            fopen($ignore_file,"w");
+        }
+
         /**
          * Ask if we want to include some default data types
          */
 
-        /*
-        $dataTypes = array();
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Contexts</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['contexts'] = array(
-                'class' => 'modContext',
-                'primary' => 'key',
-            );
-            $dataTypes['context_settings'] = array(
-                'class' => 'modContextSetting',
-                'primary' => array('context_key', 'key')
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Template Variables</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['template_variables'] = array(
-                'class' => 'modTemplateVar',
-                'primary' => 'name',
-            );
-            $dataTypes['template_variables_access'] = array(
-                'class' => 'modTemplateVarTemplate',
-                'primary' => array('tmplvarid', 'templateid')
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Content</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['content'] = array(
-                'type' => 'content',
-                'exclude_keys' => array('editedby', 'editedon'),
-                'truncate_on_force' => array('modTemplateVarResource'),
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Categories</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['categories'] = array(
-                'class' => 'modCategory',
-                'primary' => 'category',
-                'truncate_on_force' => array('modCategoryClosure'),
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Templates</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['templates'] = array(
-                'class' => 'modTemplate',
-                'primary' => 'templatename',
-                'extension' => '.html',
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Chunks</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['chunks'] = array(
-                'class' => 'modChunk',
-                'primary' => 'name',
-                'extension' => '.html'
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Snippets</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['snippets'] = array(
-                'class' => 'modSnippet',
-                'primary' => 'name',
-                'extension' => '.php'
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Plugins</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['plugins'] = array(
-                'class' => 'modPlugin',
-                'primary' => 'name',
-                'extension' => '.php'
-            );
-            $dataTypes['plugin_events'] = array(
-                'class' => 'modPluginEvent',
-                'primary' => array('pluginid', 'event')
-            );
-            $dataTypes['events'] = array(
-                'class' => 'modEvent',
-                'primary' => 'name'
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Namespaces</info>, <info>Extension Packages</info> and <info>System Settings</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['namespaces'] = array(
-                'class' => 'modNamespace',
-                'primary' => 'name'
-            );
-            $dataTypes['system_settings'] = array(
-                'class' => 'modSystemSetting',
-                'primary' => 'key',
-                'exclude_keys' => array('editedon')
-            );
-            $dataTypes['extension_packages'] = array(
-                'class' => 'modExtensionPackage',
-                'primary' => 'namespace',
-                'exclude_keys' => array('created_at', 'updated_at')
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Form Customization</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['fc_sets'] = array(
-                'class' => 'modFormCustomizationSet',
-                'primary' => 'id'
-            );
-            $dataTypes['fc_profiles'] = array(
-                'class' => 'modFormCustomizationProfile',
-                'primary' => 'id'
-            );
-            $dataTypes['fc_profile_usergroups'] = array(
-                'class' => 'modFormCustomizationProfileUserGroup',
-                'primary' => array('usergroup', 'profile')
-            );
-            $dataTypes['fc_action_dom'] = array(
-                'class' => 'modActionDom',
-                'primary' => array('set', 'name')
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Media Sources</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['mediasources'] = array(
-                'class' => 'modMediaSource',
-                'primary' => 'id'
-            );
-            $dataTypes['mediasource_elements'] = array(
-                'class' => 'sources.modMediaSourceElement',
-                'primary' => array('source', 'object_class', 'object', 'context_key'),
-            );
-        }
-
-        $question = new ConfirmationQuestion('Would you like to include <info>Dashboards</info>? <comment>(Y/N)</comment> ', true);
-        if ($helper->ask($input, $output, $question)) {
-            $dataTypes['dashboards'] = array(
-                'class' => 'modDashboard',
-                'primary' => array('id', 'name')
-            );
-            $dataTypes['dashboard_widgets'] = array(
-                'class' => 'modDashboardWidget',
-                'primary' => 'id'
-            );
-            $dataTypes['dashboard_widget_placement'] = array(
-                'class' => 'modDashboardWidgetPlacement',
-                'primary' => array('dashboard', 'widget')
-            );
-        }
-
-        $data['data'] = $dataTypes;
-*/
         if (file_exists(OLDSTYLE_WORKING_DIR . 'config.core.php')) {
             $question = new ConfirmationQuestion('Would you like to include a list of <info>Currently Installed Packages</info>? <comment>(Y/N)</comment> ', true);
             if ($helper->ask($input, $output, $question)) {

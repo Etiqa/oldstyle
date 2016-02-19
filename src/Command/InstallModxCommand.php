@@ -54,7 +54,7 @@ class InstallModxCommand extends BaseCommand
 
         // Variables for running the setup
         $tz = date_default_timezone_get();
-        $wd = GITIFY_WORKING_DIR;
+        $wd = OLDSTYLE_WORKING_DIR;
         $output->writeln("Running MODX Setup...");
 
         // Actually run the CLI setup
@@ -75,14 +75,14 @@ class InstallModxCommand extends BaseCommand
      */
     protected function createMODXConfig()
     {
-        $directory = GITIFY_WORKING_DIR;
+        $directory = OLDSTYLE_WORKING_DIR;
 
         // Creating config xml to install MODX with
         $this->output->writeln("Please complete following details to install MODX. Leave empty to use the [default].");
 
         $helper = $this->getHelper('question');
 
-        $defaultDbName = basename(GITIFY_WORKING_DIR);
+        $defaultDbName = basename(OLDSTYLE_WORKING_DIR);
         $question = new Question("Database Name [{$defaultDbName}]: ", $defaultDbName);
         $dbName = $helper->ask($this->input, $this->output, $question);
 
@@ -106,7 +106,7 @@ class InstallModxCommand extends BaseCommand
         $question = new Question('Manager Language [en]: ', 'en');
         $language = $helper->ask($this->input, $this->output, $question);
 
-        $defaultMgrUser = basename(GITIFY_WORKING_DIR) . '_admin';
+        $defaultMgrUser = basename(OLDSTYLE_WORKING_DIR) . '_admin';
         $question = new Question('Manager User [' . $defaultMgrUser . ']: ', $defaultMgrUser);
         $managerUser = $helper->ask($this->input, $this->output, $question);
 

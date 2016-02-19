@@ -7,3 +7,8 @@ dev/
 /_backup
 /_data
 /_migrate
+.backup_ignore_tables
+core/
+connectors/
+manager/
+setup/

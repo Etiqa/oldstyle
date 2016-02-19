@@ -31,7 +31,14 @@ class BackupCommand extends BaseCommand
                 'name',
                 InputArgument::OPTIONAL,
                 'Optionally the name of the backup file, useful for milestone backups. If not specified the file name will be a full timestamp.'
-            );
+            )
+            ->addOption(
+                'exclude-tables',
+                null,
+                InputOption::VALUE_NONE,
+                'Exclude table from db backup based on .Oldstyle_ignore_table file'
+            )
+        ;
     }
 
     /**
@@ -97,8 +104,17 @@ class BackupCommand extends BaseCommand
         if ($database_password != '') {
             $password_parameter = "-p'{$database_password}'";
         }
-
-        exec("mysqldump -u {$database_user} {$password_parameter} -h {$database_server} {$dbase} > {$targetFile} ");
+        if ($input->getOption("exclude-tables")) {
+            $tables = $config = Oldstyle::fromYAML(file_get_contents(OLDSTYLE_WORKING_DIR . $this->config['backup_ignore_table_file']));
+            $exclude_tables = "";
+            foreach ($tables as $table) {
+                $exclude_tables .= " ";
+                $exclude_tables .= "--ignore-table={$dbase}.{$table}";
+            }
+            exec("mysqldump -u {$database_user} {$password_parameter} -h {$database_server} {$dbase} {$exclude_tables}> {$targetFile} ");
+        }else{
+            exec("mysqldump -u {$database_user} {$password_parameter} -h {$database_server} {$dbase} > {$targetFile} ");
+        }
         return 0;
     }
 }
