@@ -1,7 +1,7 @@
 Oldsytle
 ======
 
-Oldstyle is based on Oldstyle project. The Goal is the happiness of QA department creating a new way to export data into different environments.
+Oldstyle is based on Gitify project. The Goal is the happiness of QA department creating a new way to export data into different environments.
 
 
 ## Quick Installation
